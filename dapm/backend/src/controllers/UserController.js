@@ -1,5 +1,8 @@
 const UserService = require('../services/UserService')
 const JwtService = require('../services/JwtService')
+const userOTPVerification = require('../models/UserOTPVerification')
+const bcrypt = require("bcrypt")
+const User = require('../models/UserModel')
 
 const createUser = async (req, res) => {
     try {
@@ -175,6 +178,55 @@ const logoutUser = async (req, res) => {
     } catch (e) {
         return res.status(404).json({
             message: e
+        })
+    }
+}
+const verifyOTP =  async(req,res) =>{
+    try {
+        let {userId,otp} = req.body
+        if(!userId||!otp){
+            throw Error("Empty otp details are not allowed")
+        } else {
+          const UserOTPVerificationRecords = await userOTPVerification.find({
+                userId,
+            });
+            if (UserOTPVerificationRecords.length <= 0){
+                //không có record tìm thấy
+                throw new Error(
+                    "tài khoản đã được xac nhận hoặc không tồn tại, vui lòng đăng ký nếu chưa có hoặc đang nhập khi đã xác nhận"
+                );
+            }
+            else{
+                //có record tìm thấy
+                const { ExpireAt } = UserOTPVerificationRecords[0];
+                const hashedOTP = UserOTPVerificationRecords[0].otp;
+                //check hết hạn
+                if(ExpireAt<Date.now()){
+                    //otp đã hết hạn
+                   await userOTPVerification.deleteMany({userId});
+                   throw new Error("mã otp này đã hết hạn. vui long nhấn cấp mã mới");
+                } 
+                else{
+                    const validOTP = await bcrypt.compare(otp,hashedOTP)
+                    if(!validOTP){
+                       //nhập mã sai
+                       throw new Error("OTP sai, vui lòng kiểm tra lại mail") 
+                    }
+                    else{
+                        //thành công
+                        await User.updateOne({_id:userId},{verified:true});
+                        await userOTPVerification.deleteMany({userId});
+                        return res.status(200).json({
+                            status: "DUYỆT THÀNH CÔNG",
+                            message: "tài khoản đã được duyệt"
+                        });
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        return res.status(404).json({
+            message: error
         })
     }
 }
