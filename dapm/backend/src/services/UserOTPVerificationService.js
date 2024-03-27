@@ -49,4 +49,4 @@ const sendOTPVerificationEmail = async({_id, email}, resolve) => {
     }
 };
 
-module.exports = sendOTPVerificationEmail;
+module.exports = sendOTPVerificationEmail

@@ -3,6 +3,7 @@ const JwtService = require('../services/JwtService')
 const userOTPVerification = require('../models/UserOTPVerification')
 const bcrypt = require("bcrypt")
 const User = require('../models/UserModel')
+const sendOTPVerificationEmail = require('../services/UserOTPVerificationService')
 
 const createUser = async (req, res) => {
     try {
@@ -230,6 +231,17 @@ const verifyOTP =  async(req,res) =>{
         })
     }
 }
+const resendOTP = async(req,res) =>{
+    try {
+        let {userId,otp} = req.body
+        const response = await UserService.ResendOTPverification(req.body)
+        return res.status(200).json(response)
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        })
+    }
+}
 module.exports = {
     createUser,
     loginUser,
@@ -240,5 +252,6 @@ module.exports = {
     refreshToken,
     logoutUser,
     deleteMany,
-    verifyOTP
+    verifyOTP,
+    resendOTP
 }

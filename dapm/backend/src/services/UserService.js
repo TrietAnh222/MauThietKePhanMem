@@ -2,6 +2,7 @@ const User = require("../models/UserModel")
 const bcrypt = require("bcrypt")
 const { genneralAccessToken, genneralRefreshToken } = require("./JwtService")
 const sendOTPVerificationEmail = require("./UserOTPVerificationService")
+const userOTPVerification = require("../models/UserOTPVerification")
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
@@ -181,6 +182,28 @@ const getDetailsUser = (id) => {
         }
     })
 }
+const ResendOTPverification = (user) =>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            const {userId,email} = user
+            const checkUser = await User.findOne({
+                _id: userId,
+                email:email
+            })
+            if (checkUser==null){
+                resolve({
+                    status: 'ERR',
+                    message: 'The user is not defined'
+                })
+            }else{
+                await userOTPVerification.deleteMany({userId})
+                sendOTPVerificationEmail({_id:userId,email},resolve)
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 module.exports = {
     createUser,
     loginUser,
@@ -189,4 +212,5 @@ module.exports = {
     getAllUser,
     getDetailsUser,
     deleteManyUser,
+    ResendOTPverification
 }

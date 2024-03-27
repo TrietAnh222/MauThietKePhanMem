@@ -13,5 +13,5 @@ router.get('/get-details/:id', authUserMiddleWare, userController.getDetailsUser
 router.post('/refresh-token', userController.refreshToken)
 router.post('/delete-many', authMiddleWare, userController.deleteMany)
 router.post('/verifyOTP', userController.verifyOTP)
-
+router.post('/resendOTP',userController.resendOTP)
 module.exports = router
