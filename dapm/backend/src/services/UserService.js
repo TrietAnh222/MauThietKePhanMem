@@ -1,6 +1,7 @@
 const User = require("../models/UserModel")
 const bcrypt = require("bcrypt")
 const { genneralAccessToken, genneralRefreshToken } = require("./JwtService")
+const sendOTPVerificationEmail = require("./UserOTPVerificationService")
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
@@ -20,21 +21,22 @@ const createUser = (newUser) => {
                 name,
                 email,
                 password: hash,
-                phone
+                phone,
+                verified: false,
             })
-            if (createdUser) {
-                resolve({
+           if (createdUser) { 
+            sendOTPVerificationEmail(createdUser,resolve)
+                /*resolve({ 
                     status: 'OK',
                     message: 'SUCCESS',
                     data: createdUser
-                })
+                })*/
             }
         } catch (e) {
             reject(e)
         }
     })
 }
-
 const loginUser = (userLogin) => {
     return new Promise(async (resolve, reject) => {
         const { email, password } = userLogin
@@ -179,7 +181,6 @@ const getDetailsUser = (id) => {
         }
     })
 }
-
 module.exports = {
     createUser,
     loginUser,
@@ -187,5 +188,5 @@ module.exports = {
     deleteUser,
     getAllUser,
     getDetailsUser,
-    deleteManyUser
+    deleteManyUser,
 }

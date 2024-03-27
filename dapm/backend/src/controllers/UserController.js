@@ -165,8 +165,6 @@ const refreshToken = async (req, res) => {
         })
     }
 }
-
-
 const logoutUser = async (req, res) => {
     try {
         res.clearCookie('refresh_token')
@@ -189,5 +187,6 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteMany
+    deleteMany,
+    verifyOTP
 }
