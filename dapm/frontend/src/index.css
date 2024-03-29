@@ -5,7 +5,19 @@
 :root {
   --primary-color: #fd5555;
 }
+:root {
+  --body_background: white;
+  --primary-text-color: black;
+  --body_color: black;
+  --link_color: navy;
+}
 
+[date-theme="dark"] {
+  --body_background: #282c34;
+  --primary-text-color: white;
+  --body_color: white;
+  --link_color: cyan;
+}
 body {
   margin: 0;
   padding: 0;
